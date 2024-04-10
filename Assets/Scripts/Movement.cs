@@ -1,10 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Movement : MonoBehaviour
 {
     private Rigidbody _myRigidbody;
+    private AudioSource _audioSource;
     private Vector3 _thrustVector;
     private Vector3 _rocketRotation;
     [SerializeField] private float thrustSpeed;
@@ -14,6 +13,7 @@ public class Movement : MonoBehaviour
     void Start()
     {
         _myRigidbody = GetComponent<Rigidbody>();
+        _audioSource = GetComponent<AudioSource>();
         thrustSpeed = 1000.0f;
         rotationSpeed = 100.0f;
         _thrustVector = Vector3.up;
@@ -32,7 +32,17 @@ public class Movement : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.Space))
         {
+            if (!_audioSource.isPlaying)
+            {
+                _audioSource.Play();
+            }
+
             _myRigidbody.AddRelativeForce(_thrustVector * thrustSpeed * Time.deltaTime);
+        }
+        else
+        {
+            _audioSource.Stop();
+        
         }
     }
     
