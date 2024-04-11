@@ -2,18 +2,23 @@ using UnityEngine;
 
 public class Movement : MonoBehaviour
 {
+    [SerializeField] private float thrustSpeed;
+    [SerializeField] private float rotationSpeed;
+    [SerializeField] private AudioClip thrustClip;
+    
     private Rigidbody _myRigidbody;
     private AudioSource _audioSource;
     private Vector3 _thrustVector;
     private Vector3 _rocketRotation;
-    [SerializeField] private float thrustSpeed;
-    [SerializeField] private float rotationSpeed;
+    private ParticleSystem _boosterParticles;
+    private ParticleSystem _leftThrusterParticles;
     
     // Start is called before the first frame update
     void Start()
     {
         _myRigidbody = GetComponent<Rigidbody>();
         _audioSource = GetComponent<AudioSource>();
+        _boosterParticles = GetComponent<CollisionHandler>().boosterParticles;
         thrustSpeed = 1000.0f;
         rotationSpeed = 100.0f;
         _thrustVector = Vector3.up;
@@ -34,7 +39,12 @@ public class Movement : MonoBehaviour
         {
             if (!_audioSource.isPlaying)
             {
-                _audioSource.Play();
+                _audioSource.PlayOneShot(thrustClip);
+            }
+            
+            if (!_boosterParticles.isPlaying)
+            {
+                _boosterParticles.Play();
             }
 
             _myRigidbody.AddRelativeForce(_thrustVector * thrustSpeed * Time.deltaTime);
@@ -42,7 +52,7 @@ public class Movement : MonoBehaviour
         else
         {
             _audioSource.Stop();
-        
+            _boosterParticles.Stop();
         }
     }
     
