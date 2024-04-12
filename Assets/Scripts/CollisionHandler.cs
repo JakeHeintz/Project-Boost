@@ -13,9 +13,6 @@ public class CollisionHandler : MonoBehaviour
     
     [SerializeField] private ParticleSystem crashParticles;
     [SerializeField] private ParticleSystem finishParticles;
-    [SerializeField] public ParticleSystem boosterParticles;
-    [SerializeField] private ParticleSystem leftThrusterParticles;
-    [SerializeField] private ParticleSystem rightThrusterParticles;
     
     [SerializeField] private float _finishClipVolume = 0.75f;
     [SerializeField] private float _crashClipVolume = 0.5f;
@@ -23,18 +20,26 @@ public class CollisionHandler : MonoBehaviour
 
     private AudioSource _audioSource;
     private GameObject _rocket;
+    private BoxCollider _boxCollider;
 
-    private bool _isTransitioning = false;
+    public bool _isTransitioning = false;
+    public bool collisionDisabled = false;
 
     private void Start()
     {
         _audioSource = GetComponent<AudioSource>();
+        _boxCollider = GetComponent<BoxCollider>();
         
+    }
+
+    private void Update()
+    {
+        ProcessCheats();
     }
     
     private void OnCollisionEnter(Collision other)
     {
-        if (_isTransitioning) { return; }
+        if (_isTransitioning || collisionDisabled) { return; }
 
         switch (other.gameObject.tag)
             {
@@ -81,7 +86,7 @@ public class CollisionHandler : MonoBehaviour
             Invoke("NextLevel", _finishSequenceDuration);
     }
     
-    void NextLevel()
+    public void NextLevel()
     {
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
         int nextSceneIndex = currentSceneIndex + 1;
@@ -91,6 +96,19 @@ public class CollisionHandler : MonoBehaviour
             nextSceneIndex = 0;
         }
         SceneManager.LoadScene(nextSceneIndex);
+    }
+    
+    private void ProcessCheats()
+    {
+        if (Input.GetKey(KeyCode.L))
+        {
+            NextLevel();
+        }
+        
+        if (Input.GetKey(KeyCode.C))
+        {
+            collisionDisabled = !collisionDisabled; // toggle collision
+        }
     }
     
 }
